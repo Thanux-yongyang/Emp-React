@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Users, Trash2, Edit } from "lucide-react";
+import { Users, Trash2, View } from "lucide-react";
+
 import axios from "axios";
 
 const EmployeeList = () => {
@@ -86,10 +87,10 @@ const EmployeeList = () => {
                     <td className="px-6 py-4 flex gap-3">
                       {/* Edit Button */}
                       <button
-                        onClick={() => navigate(`/employee/edit/${employee.id}`)}
+                        onClick={() => navigate(`/employee/view/${employee.id}`)}
                         className="text-blue-600 hover:text-blue-800"
                       >
-                        <Edit className="h-5 w-5" />
+                        <View className="h-5 w-5" />
                       </button>
 
                       {/* Delete Button */}
