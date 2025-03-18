@@ -146,7 +146,7 @@ export const EmployeeForm = () => {
   
 
   return (
-    <div className="max-w-2xl mx-auto p-6 ">
+    <div className="max-w-2xl mx-4 md:mx-auto p-4 md:p-6 ">
       <h2 className="text-2xl font-bold mb-6">
         {id ? "Update Employee" : "Add New Employee"}
       </h2>

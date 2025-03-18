@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { EmployeeProvider } from './context/EmployeeContext';
 import { Navigation } from './components/Navbar/Navigation';
 import { Home } from './components/Home/Home';
-import { EmployeeList } from './components/EmployeeList/EmployeeList';
+import  EmployeeList  from './components/EmployeeList/EmployeeList';
 import { EmployeeForm } from './components/EmployeeForm/EmployeeForm';
 import { Settings } from './components/Setting/Setting';
 
