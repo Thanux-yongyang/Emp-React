@@ -87,7 +87,7 @@ const EmployeeList = () => {
                     <td className="px-6 py-4 flex gap-3">
                       {/* Edit Button */}
                       <button
-                        onClick={() => navigate(`/employee/view/${employee.id}`)}
+                        onClick={() => navigate(`/employee/view/${employee.id}`, { state: { employee } })}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         <View className="h-5 w-5" />

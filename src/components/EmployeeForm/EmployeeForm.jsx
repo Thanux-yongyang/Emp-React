@@ -65,11 +65,11 @@ export const EmployeeForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     const employeeData = {
       ...formData, // Include all form fields
     };
-  
+
     try {
       let response;
       if (id) {
@@ -83,14 +83,15 @@ export const EmployeeForm = () => {
           employeeData
         );
       }
-  
+
       alert("Employee saved successfully!");
       handleClear();
       navigate("/");
     } catch (error) {
       console.error("Error saving employee:", error);
       alert(
-        error.response?.data?.message || "Error saving employee. Please try again."
+        error.response?.data?.message ||
+          "Error saving employee. Please try again."
       );
     }
   };
@@ -142,14 +143,15 @@ export const EmployeeForm = () => {
     }
   };
 
-  //sending data to the backend server 
-  
+  //sending data to the backend server
 
   return (
     <div className="max-w-2xl mx-4 md:mx-auto p-4 md:p-6 ">
-      <h2 className="text-2xl font-bold mb-6">
-        {id ? "Update Employee" : "Add New Employee"}
-      </h2>
+      <div className="flex justify-center">
+      <h2 className="text-2xl font-bold mb-6">Add New Employee</h2>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow-md p-6">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -351,7 +353,7 @@ export const EmployeeForm = () => {
             type="submit"
             className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
-            {id ? "Update" : "Add"} Employee
+            Add
           </button>
 
           <button
@@ -363,6 +365,7 @@ export const EmployeeForm = () => {
           </button>
         </div>
       </form>
+      </div>
     </div>
   );
 };

@@ -1,118 +1,330 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Save, Edit2, X } from 'lucide-react';
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ArrowLeft, Save, Edit2, X } from "lucide-react";
+import axios from "axios";
+import './EmployeeDetail.css';
 
-function EmployeeDetail() {
-  const { id } = useParams();  // Employee ID from URL (to be used in future API calls)
+const departments = [
+  "Engineering",
+  "IT",
+  "HR",
+  "Marketing",
+  "Finance",
+  "Operations",
+  "Sales",
+  "Customer Support",
+    "Legal",
+];
+
+const EmployeeDetail = () => {
   const navigate = useNavigate();
+  const { state } = useLocation(); // Retrieve employee data from Router state
+
+  // 🚨 If no employee data is found, redirect back to the employee list
+  if (!state || !state.employee) {
+    navigate("/employees");
+    return null;
+  }
+
   const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState(state.employee); // Use passed data
 
-  // Placeholder data for now, to be replaced with API data later
-  const [employee, setEmployee] = useState({
-    id: Number(id),
-    fullName: 'John Doe',
-    age: 30,
-    department: 'Engineering',
-    email: 'john.doe@example.com',
-    phone: '(555) 123-4567',
-    address: '123 Main St, City, Country',
-    position: 'Senior Developer',
-    joinDate: '2022-01-15',
-    salary: '75000'
-  });
-
-  const [editedEmployee, setEditedEmployee] = useState(employee);
-
-  const handleEdit = () => {
-    setIsEditing(true);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = () => {
-    // API call to save the updated employee data can be added here
-    setEmployee(editedEmployee);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      await axios.put(
+        `http://localhost:8080/api/employees/${formData.id}`,
+        formData
+      );
+      alert("Employee details updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      alert("Failed to update employee.");
+    }
   };
 
   const handleCancel = () => {
-    setEditedEmployee(employee);
+    setFormData(state.employee); // Reset form data to original values
     setIsEditing(false);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditedEmployee((prev) => ({
-      ...prev,
-      [name]: value
-    }));
+  const handlePostalCodeChange = (e) => {
+    let value = e.target.value.replace(/[^\d]/g, ""); // Remove non-numeric characters
+    if (value.length > 3) {
+      value = value.substring(0, 3) + "-" + value.substring(3);
+    }
+    // setPostalCode(value);
+    setFormData((prev) => ({ ...prev, postalCode: value }));
+
+    // Trigger fetch when the postal code has a valid format
+    if (value.length === 8 && /^\d{3}-\d{4}$/.test(value)) {
+      fetchAddress(value);
+    }
+  };
+  const fetchAddress = async (postalCode) => {
+    try {
+      const response = await axios.get(
+        `https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postalCode}`
+      );
+      if (response.data.results) {
+        const { address1, address2, address3 } = response.data.results[0];
+        const mainAddress = `${address1} ${address2} ${address3}`;
+        setFormData((prev) => ({ ...prev, address: mainAddress }));
+      } else {
+        setFormData((prev) => ({ ...prev, address: "Address not found" }));
+      }
+    } catch (error) {
+      setFormData((prev) => ({ ...prev, address: "Error fetching address" }));
+    }
+  };
+  const formatPhoneNumber = (e) => {
+    let input = e.target.value.replace(/[^\d]/g, ""); // Remove non-numeric characters
+    if (input.length > 11) return;
+    let formattedInput = input;
+    if (input.length >= 4 && input.length < 8) {
+      formattedInput = input.replace(/(\d{3})(\d{1,4})/, "$1-$2");
+    } else if (input.length >= 8) {
+      formattedInput = input.replace(/(\d{3})(\d{4})(\d{1,4})/, "$1-$2-$3");
+    }
+
+    setFormData((prev) => ({ ...prev, phoneNo: formattedInput })); // Update formData
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-4 md:mx-auto p-4 md:p-6">
+      {/* Header Section */}
       <div className="mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate('/employees')}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <ArrowLeft className="h-6 w-6" />
-          </button>
-          <h1 className="text-3xl font-bold text-gray-800">Employee Details</h1>
-        </div>
-        <div className="flex gap-2">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleSave}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-              >
-                <Save className="h-4 w-4" />
-                Save
-              </button>
-              <button
-                onClick={handleCancel}
-                className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-              >
-                <X className="h-4 w-4" />
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button
-              onClick={handleEdit}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
-              <Edit2 className="h-4 w-4" />
-              Edit
-            </button>
-          )}
-        </div>
+        <button
+          onClick={() => navigate("/employees")}
+          className="text-gray-600 hover:text-gray-800"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+        
       </div>
+<div className="flex justify-center">
+<h1 className="text-2xl font-bold mb-6">Employee Details</h1>
+</div>
+      
 
+      {/* Employee Form */}
       <div className="bg-white rounded-lg shadow-md p-6">
-        <div className="grid grid-cols-2 gap-6">
-          {Object.entries(editedEmployee).map(([key, value]) => (
-            <div key={key} className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700 capitalize">
-                {key.replace(/([A-Z])/g, ' $1').trim()}
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {/* First Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                First Name
               </label>
               <input
-                type={key === 'age' || key === 'salary' ? 'number' : 'text'}
-                name={key}
-                value={value}
-                onChange={handleChange}
+                type="text"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
                 disabled={!isEditing}
-                className={`w-full p-2 border rounded-md ${
-                  isEditing
-                    ? 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
-                    : 'bg-gray-50 border-gray-200'
-                }`}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
-          ))}
+
+            {/* Last Name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Last Name
+              </label>
+              <input
+                type="text"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Date of Birth & Entry Date */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Date of Birth
+              </label>
+              <input
+                type="date"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Date of Entry
+              </label>
+              <input
+                type="date"
+                name="dateOfEntry"
+                value={formData.dateOfEntry}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Gender Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Gender
+            </label>
+            <div className="mt-1 space-x-4">
+              {["Male", "Female", "Other"].map((gender) => (
+                <label key={gender} className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    name="gender"
+                    value={gender}
+                    checked={formData.gender === gender}
+                    onChange={handleInputChange}
+                    disabled={!isEditing}
+                    className="form-radio"
+                  />
+                  <span className="ml-2">{gender}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Postal Code
+              </label>
+              <input
+                type="text"
+                name="postalCode"
+                value={formData.postalCode}
+                onChange={handlePostalCodeChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Street Address
+              </label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Department
+            </label>
+            <select
+              name="department"
+              value={formData.department}
+              onChange={handleInputChange}
+              disabled={!isEditing}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              required
+            >
+              <option value="">Select Department</option>
+              {departments.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
+          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Sub Address (Room No, etc.)
+              </label>
+              <input
+                type="text"
+                name="subAddress"
+                value={formData.subAddress}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          {/* Phone Number & Email */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              disabled={!isEditing}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+          <label className="block text-sm font-medium text-gray-700">
+            Phone No
+          </label>
+          <input
+            type="text"
+            name="phoneNo"
+            value={formData.phoneNo}
+            onChange={formatPhoneNumber}
+            disabled={!isEditing}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            required
+          />
         </div>
+          <div className="flex justify-end space-x-4">
+          <div className="flex gap-2">
+        {isEditing ? (
+          <>
+            <button
+              onClick={handleSave}
+              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+            >
+              <Save className="h-4 w-4" />
+              Save
+            </button>
+            <button
+              onClick={handleCancel}
+              className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
+            >
+              <X className="h-4 w-4" />
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          >
+            <Edit2 className="h-4 w-4" />
+            Edit
+          </button>
+        )}
+      </div>
+          </div>
+        </form>
       </div>
     </div>
   );
-}
+};
 
 export default EmployeeDetail;
