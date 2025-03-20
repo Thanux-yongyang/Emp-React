@@ -1,52 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Users, Trash2, View } from "lucide-react";
-
-import axios from "axios";
+import { useEmployees } from "../../context/EmployeeContext"; // ✅ Use the context
 
 const EmployeeList = () => {
   const navigate = useNavigate();
-  const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [refresh, setRefresh] = useState(false); 
-
-  // Fetch employee data from the backend
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/employees")
-      .then((response) => {
-        setEmployees(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching employees:", error);
-        setError("Failed to load employees.");
-        setLoading(false);
-      });
-  }, [refresh]);
+  const { employees, loading, error, deleteEmployee } = useEmployees(); // ✅ Use `useEmployees` hook
 
   // Navigate to employee details
   const handleDoubleClick = (employee) => {
     navigate(`/employee/view/${employee.id}`, { state: { employee } });
   };
 
-  // Delete an employee
-  const handleDelete = async (employeeId) => {
-    if (!window.confirm("Are you sure you want to delete this employee?")) {
-      return;
-    }
-    try {
-      await axios.delete(`http://localhost:8080/api/employees/${employeeId}`);
-      setRefresh((prev) => !prev); 
-    } catch (error) {
-      console.error("Error deleting employee:", error);
-      alert("Failed to delete employee.");
-    }
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8 ">
+    <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Users className="h-8 w-8 text-blue-600" />
@@ -78,14 +45,18 @@ const EmployeeList = () => {
               {/* Table Body */}
               <tbody className="bg-white divide-y divide-gray-200">
                 {employees.map((employee) => (
-                  <tr key={employee.id} className="hover:bg-gray-100 cursor-pointer" onDoubleClick={() => handleDoubleClick(employee)}>
+                  <tr
+                    key={employee.id}
+                    className="hover:bg-gray-100 cursor-pointer"
+                    onDoubleClick={() => handleDoubleClick(employee)}
+                  >
                     <td className="px-6 py-4">{employee.id}</td>
                     <td className="px-6 py-4">{`${employee.firstName} ${employee.lastName}`}</td>
                     <td className="px-6 py-4">{employee.department}</td>
                     <td className="px-6 py-4">{employee.email}</td>
                     <td className="px-6 py-4">{employee.phoneNo}</td>
                     <td className="px-6 py-4 flex gap-3">
-                      {/* Edit Button */}
+                      {/* View Button */}
                       <button
                         onClick={() => navigate(`/employee/view/${employee.id}`, { state: { employee } })}
                         className="text-blue-600 hover:text-blue-800"
@@ -95,7 +66,7 @@ const EmployeeList = () => {
 
                       {/* Delete Button */}
                       <button
-                        onClick={() => handleDelete(employee.id)}
+                        onClick={() => deleteEmployee(employee.id)} // Use deleteEmployee from context
                         className="text-red-600 hover:text-red-800"
                       >
                         <Trash2 className="h-5 w-5" />

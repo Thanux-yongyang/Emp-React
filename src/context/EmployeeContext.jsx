@@ -1,57 +1,52 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 
-const EmployeeContext = createContext(undefined);
+// Create Employee Context
+const EmployeeContext = createContext();
 
-export const useEmployees = () => {
-  const context = useContext(EmployeeContext);
-  if (!context) {
-    throw new Error('useEmployees must be used within an EmployeeProvider');
-  }
-  return context;
-};
-
+// Provider Component
 export const EmployeeProvider = ({ children }) => {
-  const [employees, setEmployees] = useState(() => {
-    const savedEmployees = localStorage.getItem('employees');
-    return savedEmployees ? JSON.parse(savedEmployees) : [];
-  });
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  // Fetch employees from backend when app starts
   useEffect(() => {
-    localStorage.setItem('employees', JSON.stringify(employees));
-  }, [employees]);
+    axios
+      .get("http://localhost:8080/api/employees") // Your backend API endpoint
+      .then((response) => {
+        setEmployees(response.data); // Store employees in context
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching employees:", error);
+        setError("Failed to load employees.");
+        setLoading(false);
+      });
+  }, []); // Runs only once when the app loads
 
-  const addEmployee = (employeeData) => {
-    const newEmployee = {
-      ...employeeData,
-      id: uuidv4(),
-    };
-    setEmployees([...employees, newEmployee]);
+  // Function to delete an employee and update context
+  const deleteEmployee = async (employeeId) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/employees/${employeeId}`);
+      setEmployees((prevEmployees) => prevEmployees.filter((emp) => emp.id !== employeeId));
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      alert("Failed to delete employee.");
+    }
   };
 
-  const updateEmployee = (id, employeeData) => {
-    setEmployees(employees.map(emp => 
-      emp.id === id ? { ...employeeData, id } : emp
-    ));
-  };
-
-  const deleteEmployee = (id) => {
-    setEmployees(employees.filter(emp => emp.id !== id));
-  };
-
-  const getEmployee = (id) => {
-    return employees.find(emp => emp.id === id);
+  // Function to add an employee and update context
+  const addEmployee = (newEmployee) => {
+    setEmployees((prevEmployees) => [...prevEmployees, newEmployee]);
   };
 
   return (
-    <EmployeeContext.Provider value={{
-      employees,
-      addEmployee,
-      updateEmployee,
-      deleteEmployee,
-      getEmployee,
-    }}>
+    <EmployeeContext.Provider value={{ employees, loading, error, deleteEmployee, addEmployee }}>
       {children}
     </EmployeeContext.Provider>
   );
 };
+
+// Custom Hook to Use Employees Context
+export const useEmployees = () => useContext(EmployeeContext);
