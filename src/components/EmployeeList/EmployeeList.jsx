@@ -27,8 +27,8 @@ const EmployeeList = () => {
   }, [refresh]);
 
   // Navigate to employee details
-  const handleDoubleClick = (employeeId) => {
-    navigate(`/employee/${employeeId}`);
+  const handleDoubleClick = (employee) => {
+    navigate(`/employee/view/${employee.id}`, { state: { employee } });
   };
 
   // Delete an employee
@@ -46,7 +46,7 @@ const EmployeeList = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 ">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Users className="h-8 w-8 text-blue-600" />
@@ -62,7 +62,7 @@ const EmployeeList = () => {
       ) : (
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full table-fixed divide-y divide-gray-200">
               {/* Table Header */}
               <thead className="bg-gray-50">
                 <tr>
@@ -78,7 +78,7 @@ const EmployeeList = () => {
               {/* Table Body */}
               <tbody className="bg-white divide-y divide-gray-200">
                 {employees.map((employee) => (
-                  <tr key={employee.id} className="hover:bg-gray-50 cursor-pointer">
+                  <tr key={employee.id} className="hover:bg-gray-100 cursor-pointer" onDoubleClick={() => handleDoubleClick(employee)}>
                     <td className="px-6 py-4">{employee.id}</td>
                     <td className="px-6 py-4">{`${employee.firstName} ${employee.lastName}`}</td>
                     <td className="px-6 py-4">{employee.department}</td>

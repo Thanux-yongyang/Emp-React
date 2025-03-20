@@ -82,7 +82,7 @@ export const Home = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        {/* <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center space-x-4">
             <div className="p-3 bg-orange-100 rounded-lg">
               <Briefcase className="h-6 w-6 text-orange-600" />
@@ -92,7 +92,7 @@ export const Home = () => {
               <h3 className="text-2xl font-bold">12</h3>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Recent Employees */}

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Edit2, X } from "lucide-react";
 import axios from "axios";
-import './EmployeeDetail.css';
+import "./EmployeeDetail.css";
 
 const departments = [
   "Engineering",
@@ -13,7 +13,7 @@ const departments = [
   "Operations",
   "Sales",
   "Customer Support",
-    "Legal",
+  "Legal",
 ];
 
 const EmployeeDetail = () => {
@@ -95,10 +95,24 @@ const EmployeeDetail = () => {
     setFormData((prev) => ({ ...prev, phoneNo: formattedInput })); // Update formData
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this employee?")) {
+      return;
+    }
+    try {
+      await axios.delete(`http://localhost:8080/api/employees/${formData.id}`);
+      alert("Employee deleted successfully!");
+      navigate("/employees");
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      alert("Failed to delete employee.");
+    }
+  };
+
   return (
-    <div className="max-w-2xl mx-4 md:mx-auto p-4 md:p-6">
+    <div className="max-w-2xl mx-4 md:mx-auto p-4 md:p-4">
       {/* Header Section */}
-      <div className="mb-6 flex items-center justify-between">
+      {/* <div className="mb-6 flex items-center justify-between">
         <button
           onClick={() => navigate("/employees")}
           className="text-gray-600 hover:text-gray-800"
@@ -106,15 +120,15 @@ const EmployeeDetail = () => {
           <ArrowLeft className="h-6 w-6" />
         </button>
         
+      </div> */}
+      <div className="flex justify-center">
+        <h1 className="text-2xl font-bold mb-6">Employee Details</h1>
       </div>
-<div className="flex justify-center">
-<h1 className="text-2xl font-bold mb-6">Employee Details</h1>
-</div>
-      
 
       {/* Employee Form */}
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-4">
         <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+            <div className="text-blue-600 font-bold ">Employee Id: {formData.id}</div>
           <div className="grid grid-cols-2 gap-4">
             {/* First Name */}
             <div>
@@ -228,26 +242,26 @@ const EmployeeDetail = () => {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Department
-            </label>
-            <select
-              name="department"
-              value={formData.department}
-              onChange={handleInputChange}
-              disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-              required
-            >
-              <option value="">Select Department</option>
-              {departments.map((dept) => (
-                <option key={dept} value={dept}>
-                  {dept}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Department
+              </label>
+              <select
+                name="department"
+                value={formData.department}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              >
+                <option value="">Select Department</option>
+                {departments.map((dept) => (
+                  <option key={dept} value={dept}>
+                    {dept}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">
                 Sub Address (Room No, etc.)
@@ -278,48 +292,55 @@ const EmployeeDetail = () => {
             />
           </div>
           <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Phone No
-          </label>
-          <input
-            type="text"
-            name="phoneNo"
-            value={formData.phoneNo}
-            onChange={formatPhoneNumber}
-            disabled={!isEditing}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            required
-          />
-        </div>
+            <label className="block text-sm font-medium text-gray-700">
+              Phone No
+            </label>
+            <input
+              type="text"
+              name="phoneNo"
+              value={formData.phoneNo}
+              onChange={formatPhoneNumber}
+              disabled={!isEditing}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              required
+            />
+          </div>
           <div className="flex justify-end space-x-4">
-          <div className="flex gap-2">
-        {isEditing ? (
-          <>
-            <button
-              onClick={handleSave}
-              className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
-            >
-              <Save className="h-4 w-4" />
-              Save
-            </button>
-            <button
-              onClick={handleCancel}
-              className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
-            >
-              <X className="h-4 w-4" />
-              Cancel
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-          >
-            <Edit2 className="h-4 w-4" />
-            Edit
-          </button>
-        )}
-      </div>
+            <div className="flex gap-2">
+              {isEditing ? (
+                <>
+                  <button
+                    onClick={handleSave}
+                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                  >
+                    <Save className="h-4 w-4" />
+                    Save
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    className="flex items-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"
+                  >
+                    <X className="h-4 w-4" />
+                    Cancel
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                >
+                  <Edit2 className="h-4 w-4" />
+                  Edit
+                </button>
+              )}
+              <button
+                onClick={handleDelete}
+                className="flex items-center px-4 py-2 gap-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-red-600"
+              >
+                <Edit2 className="h-4 w-4" />
+                Delete
+              </button>
+            </div>
           </div>
         </form>
       </div>

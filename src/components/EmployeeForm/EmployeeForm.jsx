@@ -146,12 +146,12 @@ export const EmployeeForm = () => {
   //sending data to the backend server
 
   return (
-    <div className="max-w-2xl mx-4 md:mx-auto p-4 md:p-6 ">
+    <div className="max-w-2xl mx-4 md:mx-auto p-4 md:p-4 ">
       <div className="flex justify-center">
       <h2 className="text-2xl font-bold mb-6">Add New Employee</h2>
       </div>
       
-      <div className="bg-white rounded-lg shadow-md p-6">
+      <div className="bg-white rounded-lg shadow-md p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
