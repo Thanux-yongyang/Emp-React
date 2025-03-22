@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEmployees } from "../../context/EmployeeContext";
-import "./employeeForm.css";
+import "./EmployeeForm.css";
 import axios from "axios";
 
 const departments = [
