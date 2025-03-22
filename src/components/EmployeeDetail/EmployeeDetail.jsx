@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Edit2, X } from "lucide-react";
+import {  Save, Edit2, X } from "lucide-react";
 import axios from "axios";
 import { useEmployees } from "../../context/EmployeeContext"; // ✅ Use the context
 import "./EmployeeDetail.css";
