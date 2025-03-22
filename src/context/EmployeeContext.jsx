@@ -10,43 +10,96 @@ export const EmployeeProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch employees from backend when app starts
-  useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/employees") // Your backend API endpoint
-      .then((response) => {
-        setEmployees(response.data); // Store employees in context
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching employees:", error);
-        setError("Failed to load employees.");
-        setLoading(false);
-      });
-  }, []); // Runs only once when the app loads
+  // Helper function to handle errors
+  const handleError = (error, message) => {
+    console.error(message, error);
+    setError(message);
+    alert(message);
+  };
 
-  // Function to delete an employee and update context
-  const deleteEmployee = async (employeeId) => {
+  // Fetch employees from backend
+  const fetchEmployees = async () => {
     try {
-      await axios.delete(`http://localhost:8080/api/employees/${employeeId}`);
-      setEmployees((prevEmployees) => prevEmployees.filter((emp) => emp.id !== employeeId));
+      const response = await axios.get("http://localhost:8080/api/employees");
+      setEmployees(response.data);
+      setLoading(false);
     } catch (error) {
-      console.error("Error deleting employee:", error);
-      alert("Failed to delete employee.");
+      handleError(error, "Failed to load employees.");
+      setLoading(false);
     }
   };
 
-  // Function to add an employee and update context
-  const addEmployee = (newEmployee) => {
-    setEmployees((prevEmployees) => [...prevEmployees, newEmployee]);
+  // Initial fetch
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  // Get single employee
+  const getEmployee = (id) => {
+    return employees.find(emp => emp.id === id);
+  };
+
+  // Add employee
+  const addEmployee = async (newEmployee) => {
+    try {
+      const response = await axios.post("http://localhost:8080/api/employees", newEmployee);
+      setEmployees(prev => [...prev, response.data]);
+      return response.data;
+    } catch (error) {
+      handleError(error, "Failed to add employee.");
+      throw error;
+    }
+  };
+
+  // Update employee
+  const updateEmployee = async (id, updatedEmployee) => {
+    try {
+      const response = await axios.put(`http://localhost:8080/api/employees/${id}`, updatedEmployee);
+      setEmployees(prev =>
+        prev.map(emp => emp.id === id ? response.data : emp)
+      );
+      return response.data;
+    } catch (error) {
+      handleError(error, "Failed to update employee.");
+      throw error;
+    }
+  };
+
+  // Delete employee
+  const deleteEmployee = async (id) => {
+    try {
+      await axios.delete(`http://localhost:8080/api/employees/${id}`);
+      setEmployees(prev => prev.filter(emp => emp.id !== id));
+    } catch (error) {
+      handleError(error, "Failed to delete employee.");
+      throw error;
+    }
+  };
+
+  // Context value
+  const value = {
+    employees,
+    loading,
+    error,
+    getEmployee,
+    addEmployee,
+    updateEmployee,
+    deleteEmployee,
+    fetchEmployees // In case you need to refresh the list
   };
 
   return (
-    <EmployeeContext.Provider value={{ employees, loading, error, deleteEmployee, addEmployee }}>
+    <EmployeeContext.Provider value={value}>
       {children}
     </EmployeeContext.Provider>
   );
 };
 
-// Custom Hook to Use Employees Context
-export const useEmployees = () => useContext(EmployeeContext);
+// Custom hook to use employee context
+export const useEmployees = () => {
+  const context = useContext(EmployeeContext);
+  if (!context) {
+    throw new Error("useEmployees must be used within an EmployeeProvider");
+  }
+  return context;
+};

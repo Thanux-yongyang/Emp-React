@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Edit2, X } from "lucide-react";
 import axios from "axios";
+import { useEmployees } from "../../context/EmployeeContext"; // ✅ Use the context
 import "./EmployeeDetail.css";
 
 const departments = [
@@ -13,14 +14,14 @@ const departments = [
   "Operations",
   "Sales",
   "Customer Support",
-  "Legal",
+
 ];
 
 const EmployeeDetail = () => {
   const navigate = useNavigate();
   const { state } = useLocation(); // Retrieve employee data from Router state
 
-  // 🚨 If no employee data is found, redirect back to the employee list
+  //  If no employee data is found, redirect back to the employee list
   if (!state || !state.employee) {
     navigate("/employees");
     return null;
@@ -33,13 +34,11 @@ const EmployeeDetail = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
+  const {updateEmployee , deleteEmployee} = useEmployees(); // ✅ Use `useEmployees` hook
   const handleSave = async () => {
     try {
-      await axios.put(
-        `http://localhost:8080/api/employees/${formData.id}`,
-        formData
-      );
+      await updateEmployee(formData.id, formData)
+      
       alert("Employee details updated successfully!");
       setIsEditing(false);
     } catch (error) {
@@ -95,16 +94,17 @@ const EmployeeDetail = () => {
     setFormData((prev) => ({ ...prev, phoneNo: formattedInput })); // Update formData
   };
 
+
+
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this employee?")) {
       return;
     }
     try {
-      await axios.delete(`http://localhost:8080/api/employees/${formData.id}`);
+      await deleteEmployee(formData.id);
       alert("Employee deleted successfully!");
       navigate("/employees");
     } catch (error) {
-      console.error("Error deleting employee:", error);
       alert("Failed to delete employee.");
     }
   };
@@ -197,7 +197,7 @@ const EmployeeDetail = () => {
               Gender
             </label>
             <div className="mt-1 space-x-4">
-              {["Male", "Female", "Other"].map((gender) => (
+              {["male", "female", "other"].map((gender) => (
                 <label key={gender} className="inline-flex items-center">
                   <input
                     type="radio"

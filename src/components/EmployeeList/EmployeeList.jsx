@@ -11,7 +11,19 @@ const EmployeeList = () => {
   const handleDoubleClick = (employee) => {
     navigate(`/employee/view/${employee.id}`, { state: { employee } });
   };
-
+  
+  const handleDelete = async (employeeID) => {
+    if (!window.confirm("Are you sure you want to delete this employee?")) {
+      return;
+    }
+    try {
+      await deleteEmployee(employeeID);
+      alert("Employee deleted successfully!");
+      navigate("/employees");
+    } catch (error) {
+      alert("Failed to delete employee.");
+    }
+  };
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
@@ -66,7 +78,7 @@ const EmployeeList = () => {
 
                       {/* Delete Button */}
                       <button
-                        onClick={() => deleteEmployee(employee.id)} // Use deleteEmployee from context
+                        onClick={() => handleDelete(employee.id)} // Use deleteEmployee from context
                         className="text-red-600 hover:text-red-800"
                       >
                         <Trash2 className="h-5 w-5" />

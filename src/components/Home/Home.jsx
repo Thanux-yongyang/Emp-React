@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useEmployees } from '../../context/EmployeeContext'
-import { Users, UserPlus, Building, Briefcase } from 'lucide-react';
+import { Users, UserPlus, Building } from 'lucide-react';
 
 export const Home = () => {
   const { employees } = useEmployees();
@@ -72,7 +72,7 @@ export const Home = () => {
               <p className="text-gray-600">New This Month</p>
               <h3 className="text-2xl font-bold">
                 {employees.filter(emp => {
-                  const startDate = new Date(emp.startDate);
+                  const startDate = new Date(emp.dateOfEntry);
                   const now = new Date();
                   return startDate.getMonth() === now.getMonth() &&
                          startDate.getFullYear() === now.getFullYear();
@@ -105,18 +105,18 @@ export const Home = () => {
             {employees.slice(-5).reverse().map(employee => (
               <div key={employee.id} className="py-4 flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <img
+                  {/* <img
                     src={employee.picture || 'https://via.placeholder.com/40'}
                     alt={`${employee.firstName} ${employee.lastName}`}
                     className="h-10 w-10 rounded-full object-cover"
-                  />
+                  /> */}
                   <div>
                     <h3 className="font-medium">{employee.firstName} {employee.lastName}</h3>
                     <p className="text-sm text-gray-500">{employee.department}</p>
                   </div>
                 </div>
                 <span className="text-sm text-gray-500">
-                  Joined {new Date(employee.startDate).toLocaleDateString()}
+                  Joined {new Date(employee.dateOfEntry).toLocaleDateString()}
                 </span>
               </div>
             ))}

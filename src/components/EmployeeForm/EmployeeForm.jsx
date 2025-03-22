@@ -6,11 +6,14 @@ import axios from "axios";
 
 const departments = [
   "Engineering",
+  "IT",
+  "HR",
   "Marketing",
-  "Sales",
-  "Human Resources",
   "Finance",
   "Operations",
+  "Sales",
+  "Customer Support",
+
 ];
 
 const defaultEmployee = {
@@ -40,7 +43,7 @@ export const EmployeeForm = () => {
       const employee = getEmployee(id);
       if (employee) {
         setFormData(employee);
-        setPreviewImage(employee.picture);
+        // setPreviewImage(employee.picture);
       }
     }
   }, [id, getEmployee]);
@@ -72,18 +75,9 @@ export const EmployeeForm = () => {
 
     try {
       let response;
-      if (id) {
-        response = await axios.put(
-          `http://localhost:8080/api/employees/${id}`,
-          employeeData
-        );
-      } else {
-        response = await axios.post(
-          "http://localhost:8080/api/employees",
-          employeeData
-        );
-      }
-
+ 
+        await addEmployee(employeeData);
+      
       alert("Employee saved successfully!");
       handleClear();
       navigate("/");
@@ -111,7 +105,7 @@ export const EmployeeForm = () => {
   const handleClear = () => {
     setFormData(defaultEmployee); // Reset form to default values
 
-    setPreviewImage(""); // Remove the preview image
+    // setPreviewImage(""); // Remove the preview image
   };
   const handlePostalCodeChange = (e) => {
     let value = e.target.value.replace(/[^\d]/g, ""); // Remove non-numeric characters
