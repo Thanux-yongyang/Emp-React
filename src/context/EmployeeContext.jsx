@@ -20,7 +20,7 @@ export const EmployeeProvider = ({ children }) => {
   // Fetch employees from backend
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/employees");
+      const response = await axios.get("http://backend:8080/api/employees");
       setEmployees(response.data);
       setLoading(false);
     } catch (error) {
@@ -42,7 +42,7 @@ export const EmployeeProvider = ({ children }) => {
   // Add employee
   const addEmployee = async (newEmployee) => {
     try {
-      const response = await axios.post("http://localhost:8080/api/employees", newEmployee);
+      const response = await axios.post("http://backend:8080/api/employees", newEmployee);
       setEmployees(prev => [...prev, response.data]);
       return response.data;
     } catch (error) {
@@ -54,7 +54,7 @@ export const EmployeeProvider = ({ children }) => {
   // Update employee
   const updateEmployee = async (id, updatedEmployee) => {
     try {
-      const response = await axios.put(`http://localhost:8080/api/employees/${id}`, updatedEmployee);
+      const response = await axios.put(`http://backend:8080/api/employees/${id}`, updatedEmployee);
       setEmployees(prev =>
         prev.map(emp => emp.id === id ? response.data : emp)
       );
@@ -68,7 +68,7 @@ export const EmployeeProvider = ({ children }) => {
   // Delete employee
   const deleteEmployee = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/employees/${id}`);
+      await axios.delete(`http://backend:8080/api/employees/${id}`);
       setEmployees(prev => prev.filter(emp => emp.id !== id));
     } catch (error) {
       handleError(error, "Failed to delete employee.");
