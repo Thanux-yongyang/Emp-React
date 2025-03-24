@@ -54,7 +54,7 @@ export const EmployeeProvider = ({ children }) => {
   // Update employee
   const updateEmployee = async (id, updatedEmployee) => {
     try {
-      const response = await axios.put(`$${import.meta.env.VITE_BACKEND_URL}/api/employees/${id}`, updatedEmployee);
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/employees/${id}`, updatedEmployee);
       setEmployees(prev =>
         prev.map(emp => emp.id === id ? response.data : emp)
       );
