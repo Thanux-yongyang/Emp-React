@@ -29,6 +29,7 @@ export const EmployeeProvider = ({ children }) => {
       
     }finally {
       setLoading(false); // Reset loading state
+    }
   };
 
   // Initial fetch
