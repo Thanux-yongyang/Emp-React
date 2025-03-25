@@ -20,13 +20,15 @@ export const EmployeeProvider = ({ children }) => {
   // Fetch employees from backend
   const fetchEmployees = async () => {
     try {
+      setLoading(true); // Reset loading state
+    setError(null);   // Clear previous errors
       const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/employees`);
       setEmployees(response.data);
-      setLoading(false);
     } catch (error) {
       handleError(error, "Failed to load employees.");
-      setLoading(false);
-    }
+      
+    }finally {
+      setLoading(false); // Reset loading state
   };
 
   // Initial fetch
